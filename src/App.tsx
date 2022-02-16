@@ -1,19 +1,28 @@
 import React, { MouseEventHandler } from 'react';
 import './App.css';
+import Button from './components/Button';
 import useRecorder from "./useRecorder";
+import {TiMicrophoneOutline} from 'react-icons/ti'
+
 
 function App() {
   let [audioURL, isRecording, startRecording, stopRecording] = useRecorder();
 
+  const myRecordedVoice = new Audio(audioURL as string)
+
   return (
     <div className="App">
-        <audio  controls> <source src={audioURL as string}/> </audio>
-      <button onClick={startRecording as MouseEventHandler}  disabled={isRecording as boolean}>
-        start recording
-      </button>
-      <button onClick={stopRecording as MouseEventHandler<HTMLButtonElement>} disabled={!isRecording}>
+        <audio  src={audioURL as string} controls hidden/> 
+      <Button onClick={isRecording ? stopRecording as MouseEventHandler: startRecording as MouseEventHandler} disabled={false} color="#j4j4j4" radius="5px" width="100px">
+      <TiMicrophoneOutline />
+      </Button>
+      {/* <Button onClick={stopRecording as MouseEventHandler} disabled={!isRecording} color="#aab" radius="5px" width="100px">
         stop recording
-      </button>
+      </Button> */}
+
+      <Button onClick={() => myRecordedVoice.play()} disabled={isRecording as boolean} color="#aab" radius="5px" width="100px">
+      play
+      </Button>
     </div>
   );
 }
