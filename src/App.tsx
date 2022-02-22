@@ -1,14 +1,25 @@
-import React, { MouseEventHandler } from 'react';
+import React, { MouseEventHandler, useEffect} from 'react';
 import './App.css';
 import Button from './components/Button';
-import useRecorder from "./useRecorder";
+import useRecorder from "./hooks/useRecorder";
 import {TiMicrophoneOutline} from 'react-icons/ti'
+import { postAudioService } from './services/audio.service';
+
 
 
 function App() {
-  let [audioURL, isRecording, startRecording, stopRecording] = useRecorder();
+  let [audioURL, isRecording, startRecording, stopRecording, blob] = useRecorder();
 
   const myRecordedVoice = new Audio(audioURL as string)
+
+  useEffect(() => {
+
+    if(blob) {
+      postAudioService(blob)
+    }
+
+  }, [blob])
+
 
   return (
     <div className="App">
@@ -23,6 +34,7 @@ function App() {
       <Button onClick={() => myRecordedVoice.play()} disabled={isRecording as boolean} color="#aab" radius="5px" width="100px">
       play
       </Button>
+      <div>other tests</div>
     </div>
   );
 }
