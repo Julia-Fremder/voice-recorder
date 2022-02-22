@@ -3,22 +3,14 @@ import './App.css';
 import Button from './components/Button';
 import useRecorder from "./hooks/useRecorder";
 import {TiMicrophoneOutline} from 'react-icons/ti'
-import { postAudioService } from './services/audio.service';
+import { postAudioService , getAudioById} from './services/audio.service';
 
 
 
 function App() {
-  let [audioURL, isRecording, startRecording, stopRecording, blob] = useRecorder();
+  let [audioURL, isRecording, startRecording, stopRecording, blob, dbaudioURL] = useRecorder();
 
   const myRecordedVoice = new Audio(audioURL as string)
-
-  useEffect(() => {
-
-    if(blob) {
-      postAudioService(blob)
-    }
-
-  }, [blob])
 
 
   return (
