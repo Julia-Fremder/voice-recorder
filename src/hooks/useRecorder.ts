@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import {postAudioService} from '../services/audio.service'
 
 const useRecorder = () => {
   const [audioURL, setAudioURL] = useState("");
+  const [data, setData] = useState([]);
+  const [blob, setBlob] = useState<Blob | undefined>()
   const [isRecording, setIsRecording] = useState(false);
   const [recorder, setRecorder] = useState<MediaRecorder | null>(null);
 
@@ -17,7 +20,7 @@ const useRecorder = () => {
     // Manage recorder state.
     if (isRecording) {
       recorder.start();
-      setTimeout(() => recorder.stop(), 10000)
+      setTimeout(() => recorder.stop(), 15000)
     } else {
       recorder.stop();
     }
@@ -28,22 +31,45 @@ const useRecorder = () => {
     };
 
     recorder.addEventListener("dataavailable", handleData);
+
+    recorder.addEventListener("stop", () => {
+      const blob = new Blob(data, { 
+        'type': 'audio/mp3' 
+      });
+      setBlob(blob)
+    })
+
     
+
     //unmount the component cleans URL
     return () => recorder.removeEventListener("dataavailable", handleData);
 
 
   }, [recorder, isRecording]);
 
+  useEffect(() => {
+
+    //AudioBufffer
+    if(audioURL) {
+      postAudioService(audioURL as string)
+      console.log(audioURL as string)
+      
+    }
+  }, [audioURL])
+ 
+ 
+
   const startRecording = () => {
     setIsRecording(true);
   };
 
-  const stopRecording = () => {
+  const stopRecording = async () => {
     setIsRecording(false);
+    postAudioService('some text')
+    
   };
 
-  return [audioURL, isRecording, startRecording, stopRecording];
+  return [audioURL, isRecording, startRecording, stopRecording, blob];
 };
 
 async function requestRecorder() {
