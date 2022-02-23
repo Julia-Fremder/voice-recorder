@@ -1,14 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {getAudioById, postAudioService} from '../services/audio.service'
 
-interface audioDB {
-  config: any;
-  data: any;
-
-}
 
 const useRecorder = () => {
   const [audioURL, setAudioURL] = useState("");
+  const [audioList, setAudioList] = useState<string[]>([])
+  const [blob, setBlob] = useState<Blob | undefined>();
   const [isRecording, setIsRecording] = useState(false);
   const [recorder, setRecorder] = useState<MediaRecorder | null>(null);
 
@@ -27,13 +24,13 @@ const useRecorder = () => {
          data.push(e.data)
          setAudioURL(URL.createObjectURL(e.data));
        })
+
    
        recorder.addEventListener("stop", () => {
          const blob = new Blob(data, { 
            'type': 'audio/mp3' 
          });
-         console.log(blob, 'blob');
-         postAudioService({audio: blob})
+         setBlob(blob)
        })
    
        return recorder
@@ -53,42 +50,29 @@ const useRecorder = () => {
     // Manage recorder state.
     if (isRecording) {
       recorder.start();
-      setTimeout(() => recorder.stop(), 15000)
+      //setTimeout(() => recorder.stop(), 15000)
     } else {
       recorder.stop();
     }
-
-    // Obtain the audio when ready.
-    // const handleData = (e: BlobEvent )=> {
-    //   setAudioURL(URL.createObjectURL(e.data));
-    // };
-
-    // recorder.addEventListener("dataavailable", handleData);
-
-    // recorder.addEventListener("stop", () => {
-    //   const blob = new Blob(data, { 
-    //     'type': 'audio/mp3' 
-    //   });
-    //   postAudioService(blob)
-    // })
-
-    
+  
 
     //unmount the component cleans URL
-    //return () => recorder.removeEventListener("dataavailable", handleData);
+    return () => recorder.removeEventListener("dataavailable", (e: BlobEvent ) => {
+       setAudioURL(URL.createObjectURL(e.data));
+    });
 
 
   }, [recorder, isRecording]);
 
   useEffect(() => {
 
-    //audioURL && getAudio()
+    audioURL && setAudioList(audioList => [...audioList, audioURL]);
 
   }, [audioURL])
 
   const getAudio = useCallback(async () => {
 
-    const result: audioDB = await getAudioById(19)
+    const result = await getAudioById(19)
 
     console.log(result.data.audio)
 
@@ -102,11 +86,9 @@ const useRecorder = () => {
   };
 
   const stopRecording = async () => {
-    setIsRecording(false);
-   // postAudioService('some text')
-    
+    setIsRecording(false);    
   };
 
-return [audioURL, isRecording, startRecording, stopRecording,];
+return {audioURL, isRecording, startRecording, stopRecording, blob, audioList};
 }
 export default useRecorder;
