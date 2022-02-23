@@ -18,17 +18,35 @@
   justify-content: center;
 }
 
-#start-recorder-button {
+.recorder-button{
+  margin: 15px;
   border: none;
   border-radius: 50%;
   width: 50px;
   height: 50px;
+  color: white;
+}
+
+.start {
   background-color: #279af1;
 }
 
-#start-recorder-icon {
+.stop {
+  background-color: #ea526f;
+}
+
+.play {
+ background-color: #070600;
+}
+.hover {
+  cursor: pointer;
+}
+.recorder-icon {
   fill: white;
   font-size: 20px;
+}
+.audio-item {
+  text-decoration: underline;
 }
 
 /* @media (prefers-reduced-motion: no-preference) {

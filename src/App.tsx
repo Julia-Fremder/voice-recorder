@@ -1,4 +1,4 @@
-import React, { MouseEventHandler, useState} from 'react';
+import React, { MouseEventHandler, useEffect, useState} from 'react';
 import './App.css';
 import useRecorder from "./hooks/useRecorder";
 import {TiMicrophoneOutline, TiMediaPlayOutline, TiMediaStopOutline} from 'react-icons/ti'
@@ -25,8 +25,13 @@ function App() {
 
   const handleSaveAudio = async () => {
     await postAudioService(audioObj)
-    await getAudioByAppointment(idAppt).then(result => setAppointmentAudios(result.data as audioDB[]))
+    const result = await getAudioByAppointment(idAppt)
+    setAppointmentAudios(result.data as audioDB[])
   }
+
+  useEffect(() =>{
+   getAudioByAppointment(idAppt).then(result => setAppointmentAudios(result.data as audioDB[]))
+  }, [])
 
 
   return (
@@ -34,24 +39,24 @@ function App() {
       <header><h1>Appointment Recorder</h1><h2>It is possible to send audios to your patients!!</h2></header>
         <section className="App-recorder">
         <audio  src={audioURL as string} controls hidden/> 
-        <button className={isRecording ? "start-recorder-button" : "start-recorder-button"} onClick={isRecording ? stopRecording as MouseEventHandler : startRecording as MouseEventHandler} disabled={false}>
+        <button className={isRecording ? "stop recorder-button hover" : "start recorder-button hover"} onClick={isRecording ? stopRecording as MouseEventHandler : startRecording as MouseEventHandler} disabled={false}>
      
-      {isRecording ? <TiMediaStopOutline className="start-recorder-icon"/> : <TiMicrophoneOutline className="start-recorder-icon"/>}
+      {isRecording ? <TiMediaStopOutline className="recorder-icon"/> : <TiMicrophoneOutline className="recorder-icon"/>}
       </button>
       {/* <button onClick={stopRecording as MouseEventHandler} disabled={!isRecording} color="#aab" >
         stop recording
       </button>  */}
 
-      <button onClick={() => myRecordedVoice.play()} disabled={isRecording as boolean} color="#aab" >
-      <TiMediaPlayOutline />
+      <button className="play recorder-button hover" onClick={() => myRecordedVoice.play()} disabled={isRecording as boolean} color="#aab" >
+      <TiMediaPlayOutline className="recorder-icon"/>
       </button>
-      <button onClick={() => handleSaveAudio()} disabled={false} color="#j4j4j4">Save audio to appointment</button>
+      <button onClick={() => handleSaveAudio()} disabled={false} className="play recorder-button hover">SAVE</button>
         </section>
 
       <section className="App-audios">
       <div>Appointment Audios</div>
-      <div><button onClick={() => (new Audio(audioList[0] as string)).play()} disabled={isRecording as boolean}>audio 1</button><button onClick={() => (new Audio(audioList[1] as string)).play()} disabled={isRecording as boolean}>audio 2</button></div>
-    <div>{appointmentsAudios?.map(((audio) => (<div key={audio.id}>{audio.audio}</div>)))}</div>
+      <div>{audioList?.map(((audio, i) => (<p className="hover audio-item" onClick={() => (new Audio(audioList[0] as string)).play()} key={i}>{audio}</p>)))}</div>
+    <div>{appointmentsAudios?.map(((audio) => (<p className="hover audio-item" key={audio.id}>{audio.audio}</p>)))}</div>
       </section>
       
     </div>
